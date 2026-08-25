@@ -1,0 +1,12 @@
+{
+    "name": "senac/produtos",
+    "autoload": {
+        "psr-4": {
+            "Senac\\Produtos\\": "src/"
+        }
+    },
+    "require": {
+        "slim/slim": "4.*",
+        "slim/psr7": "*"
+    }
+}
