@@ -8,6 +8,8 @@ $app = AppFactory::create();
 
 $app->addRoutingMiddleware();
 
+$app->addBodyParsingMiddleware();
+
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
 // Função para transformar array em XML
@@ -269,5 +271,52 @@ $app->get('/filmes/plataformas', function ($request, $response) {
         ->withHeader('Content-Type', 'application/xml')
         ->withStatus(200);
 });
+$produtos = [
+    [
+        'id' => 1,
+        'nome' => 'Notebook'
+    ]
+];
 
+$app->get('/produtos/{id}', function ($request, $response, $args) use (&$produtos) {
+
+    $id = (int) $args['id'];
+
+    foreach ($produtos as $produto) {
+        if ($produto['id'] == $id) {
+
+            $response->getBody()->write(json_encode($produto));
+
+            return $response
+                ->withHeader('Content-Type', 'application/json')
+                ->withStatus(200);
+        }
+    }
+
+    $response->getBody()->write(
+        json_encode(['erro' => 'Produto não encontrado'])
+    );
+
+    return $response
+        ->withHeader('Content-Type', 'application/json')
+        ->withStatus(404);
+});
+
+$app->post('/produtos', function ($request, $response) use (&$produtos) {
+
+    $dados = $request->getParsedBody();
+
+    $novoProduto = [
+        'id' => count($produtos) + 1,
+        'nome' => $dados['nome']
+    ];
+
+    $produtos[] = $novoProduto;
+
+    $response->getBody()->write(json_encode($novoProduto));
+
+    return $response
+        ->withHeader('Content-Type', 'application/json')
+        ->withStatus(201);
+});
 $app->run();
